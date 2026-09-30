@@ -392,12 +392,36 @@ It is intentionally small so that the core idea remains easy to understand.
 
 ---
 
+## Test suite
+
+The project ships with a focused test suite that exercises the security boundary directly through the real request pipeline — no mocks for the authorization layer.
+
+| File | What it covers |
+|---|---|
+| `tests/authorization.test.ts` | Full role matrix: agent→create (201), agent→approve (403), admin→approve (200), executor→execute (200), semantic endpoints |
+| `tests/security.test.ts` | Adversarial cases: smuggled status on create, token forgery, replay attacks, executor field stripping |
+| `tests/model.test.ts` | Provider-neutral live path: stub OpenAI-compatible server, agent loop drives real Cequre backend |
+| `tests/sse.test.ts` | Realtime executor: approval event delivered over SSE, executor reacts without polling |
+| `tests/mcp.test.ts` | Cequre MCP server: JSON-RPC handshake, `tools/list` response |
+| `tests/app.test.ts` | Health check, basic server wiring |
+
+Run them all with:
+
+```bash
+bun test
+```
+
+---
+
 ## Project status
 
-Guardrail is a demonstration project built to explore and showcase Cequre's capabilities.
-
-The initial version focuses on one core guarantee:
+The core guarantee is fully implemented and tested:
 
 > **The agent can propose a risky action, but only an authorized human can approve it.**
 
-Future experiments may include MCP-based agent access, additional action types, realtime notifications, and more complex approval workflows.
+- ✅ Schema, access rules, and state-machine hooks
+- ✅ Agent worker (scripted, Anthropic, and OpenAI-compatible providers)
+- ✅ Executor worker (SSE realtime mode + polling fallback)
+- ✅ Seed data and end-to-end acceptance script
+- ✅ MCP server (`bun run mcp`)
+- ✅ Full test suite covering the security boundary
