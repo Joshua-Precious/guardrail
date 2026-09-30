@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTk3IiBoZWlnaHQ9IjE5NyIgdmlld0JveD0iMCAwIDE5NyAxOTciIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE5NyIgaGVpZ2h0PSIxOTciIHJ4PSIyNSIgZmlsbD0iYmxhY2siLz48cGF0aCBkPSJNMTYzIDQ1QzE2MyAzOS40NzcyIDE1OC41MjMgMzUgMTUzIDM1SDgxLjU0NTVDNjkuMjAwOCAzNSA1Ny4zNjE4IDM5LjY1MDIgNDguNjMyOCA0Ny45Mjc3QzM5LjkwMzkgNTYuMjA1MiAzNSA2Ny40MzE4IDM1IDc5LjEzNzlWMTE4Ljg2MkMzNSAxMzAuNTY4IDM5LjkwMzkgMTQxLjc5NSA0OC42MzI4IDE1MC4wNzJDNTcuMzYxOCAxNTguMzUgNjkuMjAwOCAxNjMgODEuNTQ1NSAxNjNIMTUzQzE1OC41MjMgMTYzIDE2MyAxNTguNTIzIDE2MyAxNTNWMTM3LjY5QzE2MyAxMzIuMTY3IDE1OC41MjMgMTI3LjY5IDE1MyAxMjcuNjlIODEuNTQ1NUM3OS4wNzY1IDEyNy42OSA3Ni43MDg3IDEyNi43NiA3NC45NjI5IDEyNS4xMDRDNzMuMjE3MSAxMjMuNDQ5IDcyLjIzNjQgMTIxLjIwMyA3Mi4yMzY0IDExOC44NjJWNzkuMTM3OUM3Mi4yMzY0IDc2Ljc5NjcgNzMuMjE3MSA3NC41NTE0IDc0Ljk2MjkgNzIuODk1OUM3Ni43MDg3IDcxLjI0MDQgNzkuMDc2NSA3MC4zMTAzIDgxLjU0NTUgNzAuMzEwM0gxNTNDMTU4LjUyMyA3MC4zMTAzIDE2MyA2NS44MzMyIDE2MyA2MC4zMTAzVjQ1WiIgZmlsbD0id2hpdGUiLz48cmVjdCB4PSIxMTEuMjQ4IiB5PSI4MC41MDM5IiB3aWR0aD0iNTEuNzUyIiBoZWlnaHQ9IjE1LjU0OTkiIHJ4PSI3Ljc3NDk0IiBmaWxsPSJ3aGl0ZSIvPjxyZWN0IHg9IjExMS4yNDgiIHk9IjEwMi4yNzQiIHdpZHRoPSI1MS43NTIiIGhlaWdodD0iMTUuNTQ5OSIgcng9IjcuNzc0OTQiIGZpbGw9IndoaXRlIi8+PC9zdmc+" />
+  <title>Cequre Backend</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Recursive:wght@300..1000&display=swap");
+
+    :root {
+      --bg: #030407;
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #ffffff;
+      --text-muted: #8a94a6;
+      --accent: #22d3ee;
+      --glow: rgba(34, 211, 238, 0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(34, 211, 238, 0.12) 0%, transparent 60%),
+        radial-gradient(circle at 50% 100%, rgba(244, 114, 182, 0.05) 0%, transparent 40%);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────────── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-mark {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+
+    .brand-mark svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 6px;
+    }
+
+    .brand small {
+      font-weight: 500;
+      color: var(--text-muted);
+      font-size: 12px;
+      margin-left: 2px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Recursive', ui-monospace, monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 99px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: #34d399;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(52, 211, 153, 0.6);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    /* ── Hero ───────────────────────────────────────────────────────────── */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+      gap: 0;
+    }
+
+    .hero {
+      text-align: center;
+      max-width: 640px;
+      margin-bottom: 48px;
+    }
+
+    .hero .eyebrow {
+      font-family: 'Recursive', ui-monospace, monospace;
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .hero h1 {
+      font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(38px, 6vw, 56px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      background: linear-gradient(180deg, #ffffff 30%, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+    }
+
+    .hero p {
+      color: var(--text-muted);
+      font-size: 17px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .hero code {
+      font-family: 'Recursive', ui-monospace, monospace;
+      font-size: 14px;
+      color: var(--accent);
+      background: rgba(34, 211, 238, 0.08);
+      border: 1px solid rgba(34, 211, 238, 0.15);
+      padding: 1px 7px;
+      border-radius: 5px;
+    }
+
+    /* ── Admin hero card ────────────────────────────────────────────────── */
+    .admin-card {
+      width: 100%;
+      max-width: 640px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.08) 0%, rgba(34, 211, 238, 0.02) 100%);
+      border: 1px solid rgba(34, 211, 238, 0.3);
+      border-radius: 18px;
+      padding: 28px 32px;
+      text-decoration: none;
+      color: var(--text);
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.25s, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s;
+      margin-bottom: 20px;
+    }
+
+    .admin-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.6), transparent);
+    }
+
+    .admin-card:hover {
+      border-color: rgba(34, 211, 238, 0.55);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(34, 211, 238, 0.12), 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .admin-card .info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .admin-card .label {
+      font-family: 'Recursive', ui-monospace, monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .admin-card .title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .admin-card .desc {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .admin-card .arrow {
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      color: var(--bg);
+      border-radius: 12px;
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .admin-card:hover .arrow {
+      transform: translateX(4px);
+    }
+
+    .admin-card .arrow svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ── Secondary grid ─────────────────────────────────────────────────── */
+    .secondary {
+      width: 100%;
+      max-width: 640px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .sec-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      text-decoration: none;
+      color: var(--text);
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .sec-card:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+
+    .sec-card .icon {
+      flex-shrink: 0;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: 'Recursive', ui-monospace, monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .sec-card .sec-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .sec-card .sec-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* ── Footer ─────────────────────────────────────────────────────────── */
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 24px;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+
+    .foot-brand {
+      display: flex;
+      align-items: center;
+    }
+
+    .foot-brand svg {
+      width: 16px;
+      height: 16px;
+      display: block;
+      border-radius: 4px;
+    }
+
+    footer .sep {
+      width: 1px;
+      height: 12px;
+      background: var(--border);
+    }
+
+    footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover {
+      color: var(--text);
+    }
+
+    @media (max-width: 640px) {
+      header { padding: 16px 20px; }
+      main { padding: 32px 20px; }
+      .admin-card { flex-direction: column; align-items: flex-start; padding: 24px; }
+      .admin-card .arrow { display: none; }
+      .secondary { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark"><svg viewBox="0 0 197 197" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cequre logo"><rect width="197" height="197" rx="25" fill="black"/><path d="M163 45C163 39.4772 158.523 35 153 35H81.5455C69.2008 35 57.3618 39.6502 48.6328 47.9277C39.9039 56.2052 35 67.4318 35 79.1379V118.862C35 130.568 39.9039 141.795 48.6328 150.072C57.3618 158.35 69.2008 163 81.5455 163H153C158.523 163 163 158.523 163 153V137.69C163 132.167 158.523 127.69 153 127.69H81.5455C79.0765 127.69 76.7087 126.76 74.9629 125.104C73.2171 123.449 72.2364 121.203 72.2364 118.862V79.1379C72.2364 76.7967 73.2171 74.5514 74.9629 72.8959C76.7087 71.2404 79.0765 70.3103 81.5455 70.3103H153C158.523 70.3103 163 65.8332 163 60.3103V45Z" fill="white"/><rect x="111.248" y="80.5039" width="51.752" height="15.5499" rx="7.77494" fill="white"/><rect x="111.248" y="102.274" width="51.752" height="15.5499" rx="7.77494" fill="white"/></svg></div>
+      Guardrail <small>Backend</small>
+    </div>
+    <div class="status">
+      <span class="status-dot"></span>
+      Running
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div class="eyebrow">Schema-first backend</div>
+      <h1>Your backend is live.</h1>
+      <p>
+        REST API under <code>/api</code>, GraphQL at <code>/graphql</code> —
+        and everything manageable from the admin console.
+      </p>
+    </div>
+
+    <a href="/admin/" class="admin-card">
+      <div class="info">
+        <div class="label">Admin Console</div>
+        <div class="title">Manage your data</div>
+        <div class="desc">Browse, create, and edit records — roles, audit log, and media included.</div>
+      </div>
+      <div class="arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </div>
+    </a>
+
+    <div class="secondary">
+      <a href="/api/docs" class="sec-card">
+        <div class="icon">API</div>
+        <div>
+          <div class="sec-title">API Docs</div>
+          <div class="sec-desc">REST endpoints &amp; schemas</div>
+        </div>
+      </a>
+      <a href="/graphql" class="sec-card">
+        <div class="icon">GQL</div>
+        <div>
+          <div class="sec-title">GraphQL</div>
+          <div class="sec-desc">Interactive explorer</div>
+        </div>
+      </a>
+    </div>
+  </main>
+
+  <footer>
+    <span class="foot-brand"><svg viewBox="0 0 197 197" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cequre logo"><rect width="197" height="197" rx="25" fill="black"/><path d="M163 45C163 39.4772 158.523 35 153 35H81.5455C69.2008 35 57.3618 39.6502 48.6328 47.9277C39.9039 56.2052 35 67.4318 35 79.1379V118.862C35 130.568 39.9039 141.795 48.6328 150.072C57.3618 158.35 69.2008 163 81.5455 163H153C158.523 163 163 158.523 163 153V137.69C163 132.167 158.523 127.69 153 127.69H81.5455C79.0765 127.69 76.7087 126.76 74.9629 125.104C73.2171 123.449 72.2364 121.203 72.2364 118.862V79.1379C72.2364 76.7967 73.2171 74.5514 74.9629 72.8959C76.7087 71.2404 79.0765 70.3103 81.5455 70.3103H153C158.523 70.3103 163 65.8332 163 60.3103V45Z" fill="white"/><rect x="111.248" y="80.5039" width="51.752" height="15.5499" rx="7.77494" fill="white"/><rect x="111.248" y="102.274" width="51.752" height="15.5499" rx="7.77494" fill="white"/></svg></span>
+    <span>Cequre Backends &middot; &copy; <span id="year"></span></span>
+    <span class="sep"></span>
+    <a href="/health">Health</a>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+collection users {
+  auth: true;
+
+  fields: {
+    name: text;
+    email: email @unique;
+    password: password;
+    role: select("admin", "user") @default("user");
+  }
+
+  access: {
+    read: true;
+    create: true;
+    update: user.id == id || user.role == "admin";
+    delete: user.role == "admin";
+  }
+}

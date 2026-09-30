@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "paths": {
+      "cequre-ts": [
+        "./cequre/_generated/runtime/cequre"
+      ]
+    },
+    "target": "es2022",
+    "types": [
+      "bun"
+    ]
+  }
+}

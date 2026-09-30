@@ -1,0 +1,40 @@
+config {
+  output: "_generated";
+
+  core: {
+    api: {
+      prefix: "/api";
+    };
+    graphql: {
+      enabled: true;
+      playground: true;
+      introspection: true;
+    };
+  };
+
+  security: {
+    cors: {
+      origin: ["*"];
+      credentials: true;
+    };
+    auth: {
+      strategies: ["jwt"];
+      jwt: {
+        accessTokenExpiry: "15m";
+        refreshTokenExpiry: "7d";
+      }
+    }
+  };
+
+  monitoring: {
+    enabled: true;
+    apiKey: env("MONITORING_API_KEY");
+    healthCheck: {
+      path: "/health";
+    }
+  };
+
+  adminUi: {
+    collection: "admins";
+  };
+}
