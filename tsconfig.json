@@ -10,6 +10,7 @@
     "target": "es2022",
     "types": [
       "bun"
-    ]
+    ],
+    "skipLibCheck": true
   }
 }

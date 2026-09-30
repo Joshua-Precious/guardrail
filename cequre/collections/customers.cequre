@@ -1,13 +1,12 @@
-collection messages {
+collection customers {
   fields: {
-    conversation: relationship("conversations");
-    sender: select("user", "agent");
-    content: text;
+    name: text;
+    email: email @unique;
   }
 
   access: {
     read: user.role == "agent" || user.role == "executor" || user.role == "admin" || user.role == "super" || user.role == "editor";
-    create: user.role == "agent" || user.role == "admin" || user.role == "super";
+    create: user.role == "admin" || user.role == "super";
     update: user.role == "admin" || user.role == "super";
     delete: user.role == "admin" || user.role == "super";
   }

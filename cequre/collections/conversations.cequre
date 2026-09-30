@@ -1,0 +1,13 @@
+collection conversations {
+  fields: {
+    customer: relationship("customers");
+    status: select("open", "closed") @default("open");
+  }
+
+  access: {
+    read: user.role == "agent" || user.role == "executor" || user.role == "admin" || user.role == "super" || user.role == "editor";
+    create: user.role == "agent" || user.role == "admin" || user.role == "super";
+    update: user.role == "agent" || user.role == "admin" || user.role == "super";
+    delete: user.role == "admin" || user.role == "super";
+  }
+}

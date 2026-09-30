@@ -142,7 +142,7 @@ The agent does not get to decide whether it has permission.
                          ┌─────────────────────┐
                          │      AI Agent       │
                          │                     │
-                         │ Claude + Bun        │
+                         │ LLM + Bun           │
                          │                     │
                          │ Read data           │
                          │ Reason              │
@@ -195,7 +195,7 @@ The access rules are the primary security mechanism demonstrated by the project.
 
 ### AI Agent
 
-A small Bun-based worker powered by Claude.
+A small Bun-based worker powered by a pluggable LLM (any tool-calling provider).
 
 The agent has two categories of tools.
 
@@ -303,6 +303,46 @@ The result is stored on the action.
 
 ---
 
+## Running the backend locally
+
+```bash
+bun install
+cequre db:sync            # apply the schema (cequre dev syncs automatically)
+cequre dev                # optional: watch the DSL + hot-reload the server
+
+bun run seed              # admin + agent + executor accounts, customer, order #1024
+bun run acceptance        # propose -> 403 -> approve -> execute, end to end
+bun test                  # the authorization matrix
+bun run model:check       # verify the agent's model provider configuration
+```
+
+The two workers are plain Bun processes:
+
+```bash
+bun run agent "I was charged twice for order #1024. Please refund me." --self-approve
+bun run executor          # poll for approved actions (use --once for a single pass)
+```
+
+The agent's model layer is provider-neutral. The default `scripted` provider is
+deterministic and needs no API key; point it at any tool-calling model instead:
+
+```bash
+AI_PROVIDER=openai-compatible AI_MODEL=gpt-4o-mini \
+  AI_BASE_URL=https://api.openai.com/v1 AI_API_KEY=... \
+  bun run agent "I was charged twice for order #1024. Please refund me."
+```
+
+`AI_PROVIDER` accepts `scripted`, `openai-compatible` (OpenAI, OpenRouter, Groq,
+Together, Ollama, vLLM, ...), or `anthropic`.
+
+Administrators can also act through intent-revealing endpoints instead of a raw
+PATCH: `POST /api/agent_actions/:id/approve`, `/reject`, and `/execute`. They are
+thin aliases that re-enter the same pipeline, so the schema access rules and the
+transition hooks still decide the outcome — an agent calling `/approve` is still
+rejected with `403`.
+
+---
+
 ## Why this project exists
 
 Guardrail is primarily a demonstration project.
@@ -326,7 +366,7 @@ It is intentionally small so that the core idea remains easy to understand.
 
 - **Cequre** — backend, database, authentication and authorization
 - **Bun** — agent and worker runtime
-- **Claude** — AI agent
+- **LLM provider** — any tool-calling model (provider-neutral)
 - **TypeScript** — application code
 - **REST / MCP** — agent-to-backend communication, depending on the implementation
 

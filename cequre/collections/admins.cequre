@@ -6,14 +6,14 @@ collection admins {
     name: text;
     email: email @unique;
     password: password;
-    role: select("super", "editor") @default("editor");
+    role: select("admin", "super", "editor") @default("admin");
     avatar: text @optional;
   }
 
   access: {
-    read: user.role == "super";
-    create: user.role == "super";
-    update: user.id == id || user.role == "super";
-    delete: user.role == "super";
+    read: user.role == "admin" || user.role == "super";
+    create: user.role == "admin" || user.role == "super";
+    update: user.id == id || user.role == "admin" || user.role == "super";
+    delete: user.role == "admin" || user.role == "super";
   }
 }

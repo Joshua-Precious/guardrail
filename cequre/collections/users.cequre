@@ -5,12 +5,12 @@ collection users {
     name: text;
     email: email @unique;
     password: password;
-    role: select("admin", "user") @default("user");
+    role: select("admin", "agent", "executor", "user") @default("user");
   }
 
   access: {
-    read: true;
-    create: true;
+    read: user.id == id || user.role == "admin";
+    create: user.role == "admin";
     update: user.id == id || user.role == "admin";
     delete: user.role == "admin";
   }

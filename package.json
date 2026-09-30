@@ -7,7 +7,13 @@
     "build": "bun build cequre/index.ts --outdir dist --target bun",
     "dev": "cequre dev -e cequre/index.ts",
     "start": "NODE_ENV=production bun run dist/index.js",
-    "test": "bun test"
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "seed": "bun run scripts/seed.ts",
+    "acceptance": "bun run scripts/acceptance.ts",
+    "agent": "bun run agent/index.ts",
+    "model:check": "bun run scripts/model-check.ts",
+    "executor": "bun run executor/index.ts"
   },
   "dependencies": {},
   "devDependencies": {

@@ -1,0 +1,15 @@
+collection orders {
+  fields: {
+    reference: text @unique;
+    customer: relationship("customers");
+    amount: number;
+    status: select("pending", "paid", "refunded", "cancelled") @default("pending");
+  }
+
+  access: {
+    read: user.role == "agent" || user.role == "executor" || user.role == "admin" || user.role == "super" || user.role == "editor";
+    create: user.role == "admin" || user.role == "super";
+    update: user.role == "admin" || user.role == "super";
+    delete: user.role == "admin" || user.role == "super";
+  }
+}

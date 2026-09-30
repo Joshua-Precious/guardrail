@@ -1,0 +1,17 @@
+collection agent_actions {
+  fields: {
+    type: select("refund", "close_ticket", "escalate");
+    status: select("pending", "approved", "rejected", "executed", "failed") @default("pending");
+    customer: relationship("customers");
+    order: relationship("orders") @optional;
+    reasoning: text;
+    result: text @optional;
+  }
+
+  access: {
+    read: user.role == "agent" || user.role == "executor" || user.role == "admin" || user.role == "super" || user.role == "editor";
+    create: user.role == "agent";
+    update: user.role == "admin" || user.role == "super" || user.role == "editor" || user.role == "executor";
+    delete: user.role == "admin" || user.role == "super";
+  }
+}
