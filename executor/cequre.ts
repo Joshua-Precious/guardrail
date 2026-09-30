@@ -18,7 +18,7 @@ export interface ExecutedAction {
 }
 
 export class ExecutorApi {
-  constructor(private readonly token: string) {}
+  constructor(readonly token: string) {}
 
   static async connect(email: string, password: string): Promise<ExecutorApi> {
     return new ExecutorApi(await login("users", email, password));

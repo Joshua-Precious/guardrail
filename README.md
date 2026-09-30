@@ -320,20 +320,40 @@ The two workers are plain Bun processes:
 
 ```bash
 bun run agent "I was charged twice for order #1024. Please refund me." --self-approve
-bun run executor          # poll for approved actions (use --once for a single pass)
+bun run executor          # realtime: reacts to approvals over SSE
+bun run executor --poll   # polling fallback
+bun run executor --once   # process the current batch and exit
 ```
 
-The agent's model layer is provider-neutral. The default `scripted` provider is
-deterministic and needs no API key; point it at any tool-calling model instead:
+### The agent's model
+
+The model layer is provider-neutral. Configure it in `.env`; the default is
+Ollama, so the agent runs entirely locally:
 
 ```bash
-AI_PROVIDER=openai-compatible AI_MODEL=gpt-4o-mini \
-  AI_BASE_URL=https://api.openai.com/v1 AI_API_KEY=... \
-  bun run agent "I was charged twice for order #1024. Please refund me."
+ollama serve
+ollama pull llama3.2      # a small local model, or reuse one you already have
+
+AI_PROVIDER=openai-compatible
+AI_BASE_URL=http://localhost:11434/v1
+AI_MODEL=llama3.2         # any name from `ollama list`
+AI_API_KEY=ollama         # Ollama ignores the value, but the client requires one
 ```
 
-`AI_PROVIDER` accepts `scripted`, `openai-compatible` (OpenAI, OpenRouter, Groq,
-Together, Ollama, vLLM, ...), or `anthropic`.
+`AI_PROVIDER` also accepts `scripted` (deterministic, no network — used by the
+test suite) or `anthropic`. Any OpenAI-compatible endpoint works the same way
+(OpenAI, OpenRouter, Groq, vLLM, ...). Any tool-calling model works; small models
+with reliable tool calls include `llama3.2`, `llama3.1`, and `qwen2.5`.
+
+### MCP
+
+`bun run mcp` starts Cequre's native MCP server over stdio (`bun run mcp:http`
+serves it over HTTP/SSE on port 3737). Point an MCP client at it and an assistant
+gets schema-aware access to the backend: `cequre_schema`, `cequre_security`,
+`cequre_routes`, `cequre_database`, `cequre_test`, and friends. Note these are
+*development* tools — the runtime tools (`get_customer`, `propose_refund`, ...)
+stay with the agent worker, and every data request still goes through the same
+access rules.
 
 Administrators can also act through intent-revealing endpoints instead of a raw
 PATCH: `POST /api/agent_actions/:id/approve`, `/reject`, and `/execute`. They are

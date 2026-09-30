@@ -1,6 +1,14 @@
 collection agent_actions {
+  // Broadcast status changes so the executor can react the moment an admin
+  // approves an action, instead of polling.
+  realtime: {
+    sse: true;
+  }
+
   fields: {
     type: select("refund", "close_ticket", "escalate");
+    // Field-level write restrictions live in cequre/routes/index.ts: this CLI
+    // compiles the DSL access block but not per-field writeRoles.
     status: select("pending", "approved", "rejected", "executed", "failed") @default("pending");
     customer: relationship("customers");
     order: relationship("orders") @optional;

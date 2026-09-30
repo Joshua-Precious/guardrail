@@ -20,12 +20,27 @@ const APPROVER_ROLES = ["admin", "super", "editor"];
  */
 routesModule.hooks("agent_actions", {
   beforeCreate: (ctx) => {
-    // A proposal can never be born anything but pending, whatever the payload.
-    (ctx.data as any).status = "pending";
-    return ctx.data;
+    const data = ctx.data as any;
+    // A proposal can never be born anything but pending, and can never carry a
+    // executor-supplied result, whatever the payload claims.
+    data.status = "pending";
+    delete data.result;
+    return data;
   },
 
   beforeUpdate: async (ctx) => {
+    const data = ctx.data as any;
+    const role = ctx.user?.role ?? "";
+    const isApprover = APPROVER_ROLES.includes(role);
+    const isExecutor = role === "executor";
+
+    // Executors may only report an outcome; they cannot rewrite a proposal.
+    if (isExecutor) {
+      for (const key of Object.keys(data)) {
+        if (key !== "status" && key !== "result") delete data[key];
+      }
+    }
+
     const params = (ctx as { params?: { id?: string } }).params;
     const id =
       params?.id ??
@@ -33,20 +48,26 @@ routesModule.hooks("agent_actions", {
     const current = id ? await ctx.cequre.findById("agent_actions", id) : null;
 
     const from = (current as { status?: string } | null)?.status;
-    const to = (ctx.data as { status?: string }).status;
+    const to = data.status as string | undefined;
 
     // Updating something other than status (e.g. recording a result) is allowed.
-    if (to === undefined || to === from) return ctx.data;
+    if (to === undefined) return data;
 
-    const role = ctx.user?.role ?? "";
-    const isApprover = APPROVER_ROLES.includes(role);
-    const isExecutor = role === "executor";
+    if (to === from) {
+      // Idempotent no-ops are fine, except replaying a finished execution.
+      if (isExecutor && (to === "executed" || to === "failed")) {
+        throw CequreError.Forbidden(
+          `agent_actions ${id} is already "${to}"; refusing to re-run it`
+        );
+      }
+      return data;
+    }
 
     if (isApprover && from === "pending" && (to === "approved" || to === "rejected")) {
-      return ctx.data;
+      return data;
     }
     if (isExecutor && from === "approved" && (to === "executed" || to === "failed")) {
-      return ctx.data;
+      return data;
     }
 
     throw CequreError.Forbidden(

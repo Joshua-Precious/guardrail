@@ -4,16 +4,25 @@
   "type": "module",
   "module": "index.ts",
   "scripts": {
-    "build": "bun build cequre/index.ts --outdir dist --target bun",
+    "schema": "cequre generate",
+    "db:sync": "cequre db:sync",
     "dev": "cequre dev -e cequre/index.ts",
-    "start": "NODE_ENV=production bun run dist/index.js",
+    "build": "bun run build:server && bun run build:agent && bun run build:executor",
+    "build:server": "bun build cequre/index.ts --outfile dist/server.js --target bun",
+    "build:agent": "bun build agent/index.ts --outfile dist/agent.js --target bun",
+    "build:executor": "bun build executor/index.ts --outfile dist/executor.js --target bun",
+    "start": "NODE_ENV=production bun run dist/server.js",
+    "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
+    "check": "bun run typecheck && bun test",
     "seed": "bun run scripts/seed.ts",
     "acceptance": "bun run scripts/acceptance.ts",
     "agent": "bun run agent/index.ts",
     "model:check": "bun run scripts/model-check.ts",
-    "executor": "bun run executor/index.ts"
+    "executor": "bun run executor/index.ts",
+    "mcp": "cequre mcp --workspace .",
+    "mcp:http": "cequre mcp --workspace . --port 3737"
   },
   "dependencies": {},
   "devDependencies": {
