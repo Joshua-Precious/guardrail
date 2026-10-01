@@ -94,14 +94,14 @@ bun test
 Expected output:
 
 ```
- 36 pass
+ 40 pass
  0 fail
-Ran 36 tests across 6 files.
+Ran 40 tests across 6 files.
 ```
 
 What the tests cover:
 - **authorization** — full role matrix (agent→create ✅, agent→approve ❌ 403, admin→approve ✅, executor→execute ✅)
-- **security** — token forgery, replay attacks, smuggled status fields
+- **security** — token forgery, replay attacks, smuggled status fields, malformed payloads rejected before the hooks run
 - **model** — agent loop against a stub OpenAI-compatible server
 - **sse** — realtime executor reacts to approval events without polling
 - **mcp** — Cequre MCP server JSON-RPC handshake
@@ -243,9 +243,10 @@ Point any MCP client at it for schema-aware access to the backend.
 |---|---|
 | `cequre dev` | Start the backend server |
 | `bun run seed` | Create demo accounts and data |
-| `bun test` | Run the full test suite (36 tests) |
+| `bun test` | Run the full test suite (40 tests) |
 | `bun run acceptance` | End-to-end flow in one command |
 | `bun run agent "..."` | Run the agent worker |
 | `bun run executor` | Start the executor (SSE mode) |
 | `bun run model:check` | Verify AI provider config |
+| `bun run measure` | Boot time + idle memory of the server |
 | `bun run mcp` | Start the MCP server |

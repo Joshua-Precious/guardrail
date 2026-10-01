@@ -25,7 +25,7 @@ $ bun run acceptance --live
 PASS (live model) — the agent could propose the action. Only a human could approve it.
 ```
 
-Runs end to end, **36 tests, 0 failures**, verified with a live model. It is a demo, not
+Runs end to end, **40 tests, 0 failures**, verified with a live model. It is a demo, not
 production software — the refund is simulated. See [Not in scope](#not-in-scope).
 
 **Contents** · [What you can build](#what-you-can-build-with-it) ·
@@ -110,7 +110,7 @@ bun run seed                 # admin + agent + executor accounts, customer, orde
 ```bash
 bun run acceptance           # deterministic agent (scripted provider)
 bun run acceptance --live    # the real model picks its own tools, then gets 403
-bun test                     # 36 tests covering the authorization matrix
+bun test                     # 40 tests covering the authorization matrix
 ```
 
 **Run the pieces individually:**
@@ -427,14 +427,14 @@ the authorization layer is never mocked.
 | File | What it covers |
 |---|---|
 | `tests/authorization.test.ts` | Full role matrix: agent→create (201), agent→approve (403), admin→approve (200), executor→execute (200), semantic endpoints |
-| `tests/security.test.ts` | Adversarial cases: smuggled status on create, token forgery, replay attacks, executor field stripping |
+| `tests/security.test.ts` | Adversarial cases: smuggled status on create, token forgery, replay attacks, executor field stripping, malformed payloads |
 | `tests/model.test.ts` | Provider-neutral live path: stub OpenAI-compatible server, agent loop drives the real Cequre backend |
 | `tests/sse.test.ts` | Realtime executor: approval event delivered over SSE, executor reacts without polling |
 | `tests/mcp.test.ts` | Cequre MCP server: JSON-RPC handshake, `tools/list` response |
 | `tests/app.test.ts` | Health check, basic server wiring |
 
 ```bash
-bun test          # 36 pass, 0 fail
+bun test          # 40 pass, 0 fail
 bun run check     # typecheck + tests
 ```
 

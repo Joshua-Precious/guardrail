@@ -142,3 +142,41 @@ describe("replay and tampering", () => {
     expect([401, 403]).toContain(res.status);
   });
 });
+
+describe("malformed payloads never reach the hooks", () => {
+  test("an unknown enum value is rejected", async () => {
+    const res = await api<{ message: string }>("POST", "/api/agent_actions", {
+      token: demo.agentToken,
+      body: { type: "wire_transfer", customer: demo.customer.id, reasoning: "x" },
+    });
+    expect(res.status).toBe(400);
+    expect(res.data.message).toContain("/type");
+  });
+
+  test("a missing required field is rejected", async () => {
+    const res = await api<{ message: string }>("POST", "/api/agent_actions", {
+      token: demo.agentToken,
+      body: { type: "refund", reasoning: "x" },
+    });
+    expect(res.status).toBe(400);
+    expect(res.data.message).toContain("/customer");
+  });
+
+  test("a wrongly typed field is rejected", async () => {
+    const res = await api<{ message: string }>("POST", "/api/agent_actions", {
+      token: demo.agentToken,
+      body: { type: "refund", customer: demo.customer.id, reasoning: 12345 },
+    });
+    expect(res.status).toBe(400);
+    expect(res.data.message).toContain("/reasoning");
+  });
+
+  test("an undeclared field is rejected", async () => {
+    const res = await api<{ message: string }>("POST", "/api/agent_actions", {
+      token: demo.agentToken,
+      body: { type: "refund", customer: demo.customer.id, reasoning: "x", bogus: "y" },
+    });
+    expect(res.status).toBe(400);
+    expect(res.data.message).toContain("/bogus");
+  });
+});

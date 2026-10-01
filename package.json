@@ -20,6 +20,7 @@
     "acceptance": "bun run scripts/acceptance.ts",
     "agent": "bun run agent/index.ts",
     "model:check": "bun run scripts/model-check.ts",
+    "measure": "bun run scripts/measure.ts",
     "executor": "bun run executor/index.ts",
     "mcp": "cequre mcp --workspace .",
     "mcp:http": "cequre mcp --workspace . --port 3737"
