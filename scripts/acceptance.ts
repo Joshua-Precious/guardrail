@@ -1,23 +1,84 @@
 /**
  * End-to-end acceptance run for the Guardrail guarantee.
  *
- *   bun run acceptance
+ *   bun run acceptance          deterministic agent (scripted provider)
+ *   bun run acceptance --live   the real model decides what to propose
  *
  * Proves, against the real request pipeline:
  *   agent proposes -> agent is denied approval (403) -> admin approves ->
  *   executor executes -> action is executed.
+ *
+ * Without --live the proposal step is a direct API call, so the run is
+ * reproducible with no credentials. With --live the same guarantee is proven
+ * after the configured model has chosen its own tools (see `bun run model:check`).
  */
 import { approveAction, login } from "../lib/app";
 import { AgentApi } from "../agent/cequre";
+import { runAgent } from "../agent/index";
 import { ExecutorApi } from "../executor/cequre";
 import { runExecutorOnce } from "../executor/index";
-import { ADMIN, AGENT, EXECUTOR, seed } from "./seed";
+import { ADMIN, AGENT, EXECUTOR, seed, type SeedResult } from "./seed";
+
+const CUSTOMER_MESSAGE = "I was charged twice for order #1024. Please refund me.";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`Assertion failed: ${message}`);
 }
 
+/** Step [2]: how the proposal is created. */
+async function createProposal(live: boolean, agent: AgentApi, seeded: SeedResult): Promise<string> {
+  if (!live) {
+    const proposal = await agent.proposeAction({
+      type: "refund",
+      customer: seeded.customer.id,
+      order: seeded.order.id,
+      reasoning: "Possible duplicate charge on an already-paid order.",
+    });
+    assert(proposal.ok, `proposal failed (${proposal.status})`);
+    assert(proposal.data.status === "pending", "a proposal must start as pending");
+    console.log(`    created ${proposal.data.id} (refund, pending)`);
+    return proposal.data.id;
+  }
+
+  const provider = (process.env.AI_PROVIDER ?? "scripted").toLowerCase();
+  if (provider === "scripted" || provider === "") {
+    throw new Error(
+      "--live needs a real provider; AI_PROVIDER is scripted. Run `bun run model:check`."
+    );
+  }
+  console.log(`    provider=${provider} model=${process.env.AI_MODEL ?? "(unset)"}`);
+  console.log("    letting the model choose its own tools...\n");
+
+  const run = await runAgent({
+    api: agent,
+    userMessage: CUSTOMER_MESSAGE,
+    ctx: { conversationId: seeded.conversation.id, defaultCustomerId: seeded.customer.id },
+    context: {
+      customerId: seeded.customer.id,
+      customerName: seeded.customer.name,
+      orderId: seeded.order.id,
+      orderReference: seeded.order.reference,
+      conversationId: seeded.conversation.id,
+    },
+  });
+
+  for (const entry of run.transcript) {
+    const outcome = entry.outcome as { ok?: boolean; error?: string };
+    console.log(`      -> ${entry.tool}${outcome.ok === false ? ` (failed: ${outcome.error})` : ""}`);
+  }
+
+  assert(run.proposedActionIds.length > 0, "the model never proposed a risky action");
+  const actionId = run.proposedActionIds[0];
+  const proposal = await agent.getAction(actionId);
+  assert(proposal.ok, "should be able to read the model's proposal back");
+  assert(proposal.data.status === "pending", `a proposal must start as pending, got ${proposal.data.status}`);
+  console.log(`    created ${actionId} (${proposal.data.type}, pending)`);
+  console.log(`\n    model reply: ${run.content.trim().split("\n")[0]}`);
+  return actionId;
+}
+
 async function main() {
+  const live = process.argv.includes("--live");
   const seeded = await seed();
   const agent = await AgentApi.connect(AGENT.email, AGENT.password);
 
@@ -29,16 +90,7 @@ async function main() {
   );
 
   console.log("\n[2] Agent proposes a refund");
-  const proposal = await agent.proposeAction({
-    type: "refund",
-    customer: seeded.customer.id,
-    order: seeded.order.id,
-    reasoning: "Possible duplicate charge on an already-paid order.",
-  });
-  assert(proposal.ok, `proposal failed (${proposal.status})`);
-  assert(proposal.data.status === "pending", "a proposal must start as pending");
-  const actionId = proposal.data.id;
-  console.log(`    created ${actionId} (refund, pending)`);
+  const actionId = await createProposal(live, agent, seeded);
 
   console.log("\n[3] Agent attempts to approve its own proposal");
   const attempt = await agent.attemptSelfApproval(actionId);
@@ -64,7 +116,7 @@ async function main() {
   console.log(`    status=${final.data.status} result="${final.data.result}"`);
 
   console.log(
-    "\nPASS — the agent could propose the action. Only a human could approve it.\n"
+    `\nPASS${live ? " (live model)" : ""} — the agent could propose the action. Only a human could approve it.\n`
   );
 }
 
